@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Slideshow</title>
+    <meta name="description" content="A full screen slideshow of GIFs featuring cats sometimes">
+    <meta name="og:title" content="Stuff">
+    <meta name="og:description" content="A full screen slideshow of GIFs featuring cats sometimes">
+    <meta name="og:image" content="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif">
+    <style>
+      /* Make the slideshow take up the entire screen */
+      .slideshow {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Stretch the images to fit the full screen without maintaining the aspect ratio */
+      .slideshow img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      /* Make the slideshow responsive */
+      @media (max-width: 600px) {
+        .slideshow {
+          height: 50%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slideshow">
+      <!-- This div will be used to hold the GIF images -->
+    </div>
+      <script>
+      let currentImageIndex = 0;
+
+      /**
+       * Returns an array of GIF objects from the Giphy API based on the specified search query.
+       * @param {string} query - The search query.
+       * @returns {Array} An array of GIF objects.
+       */
+      async function getGifs(query) {
+        const apiKey = 'YOURAPIKEY';
+        const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${query}&limit=25`);
+        return (await response.json()).data;
+      }
+
+      /**
+       * Shuffles the elements in the specified array in place.
+       * @param {Array} array - The array to shuffle.
+       */
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      /**
+       * Returns a random search query.
+       * @returns {string} A random search query.
+       */
+      function getRandomQuery() {
+        const queries = [
+          'cat',
+          'dog',
+          'bird',
+          'fish',
+          'lizard',
+          'reptile',
+          'saurian',
+          'amphibian',
+          'insect',
+          'arachnid',
+          'primate',
+          'mammal',
+          'woodmurderedhat',
+          'pixelart',
+          'rock',
+          'jazz',
+          'crazy',
+          'glitch',
+          'tempo',
+          'loop',
+          'sick',
+          'awesome',
+          'nice',
+          'tentacle',
+        ];
+        return queries[Math.floor(Math.random() * queries.length)];
+      }
+
+       /**
+       * Shows the next image in the slideshow.
+       */
+       function showNextImage() {
+        // Get all the images
+        const images = document.querySelectorAll('.slideshow img');
+        // Increment the current image index, or reset it to 0 if it's at the end of the list
+        currentImageIndex = (currentImageIndex + 1) % images.length;
+        // Show the current image
+        images.forEach((image, index) => {
+          image.style.display = index === currentImageIndex ? 'block' : 'none';
+        });
+      }
+
+      /**
+       * Gets GIFs from Giphy based on a random query, shuffles them, and shows them in the slideshow.
+       */
+      async function getAndShowGifs() {
+        // Get a random query
+        const query = getRandomQuery();
+        // Get GIFs from Giphy
+        const gifs = await getGifs(query);
+        // Shuffle the array of GIFs
+        shuffleArray(gifs);
+        // Create img elements for each GIF and append them to the slideshow container
+        document.querySelector('.slideshow').innerHTML = gifs
+          .map(gif => `<img src="${gif.images.original.url}" alt="${gif.title}">`)
+          .join('');
+        // Reset the current image index
+        currentImageIndex = 0;
+        // Show the first image
+        showNextImage();
+      }
+
+      // Show the first set of GIFs when the page loads
+      getAndShowGifs();
+
+      // Show the next image every 10 seconds
+      setInterval(showNextImage, 10000);
+
+      // Get and show a new set of GIFs every 300 seconds
+      setInterval(getAndShowGifs, 300000);
+
+      
+    </script>
+
+  </body>
+</html>
